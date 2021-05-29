@@ -1,6 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+/*
+ *        Trabajo Practico N° 4 - Inscripcion.
+ *        Integrantes: Carlos Charletti
+ *                     Clara Zaragosa
+ *                     José Llauró
+ *                     Tomas Agustin Garcia Martinez
+ *                     
+ *        1° Cuatrimestre - Año 2021 - Curso: CAI - Mendez.
+ * */
+
 
 namespace TrabajoPractico4
 {
@@ -11,10 +21,10 @@ namespace TrabajoPractico4
             #region variables para inscripciones
             int numeroRegistro;
             bool registro = false;
+            bool yaseInscribio = false;
             // Fin nro registro verif.
             bool parseCuartaMateria = false;
             string cuartaMateria;
-            bool inscribeCuartaMateria = false;
             int cicloFORcuartaMateria = 0;
             bool parseCarreras = false;
             int numerocarrera = 0;
@@ -22,6 +32,8 @@ namespace TrabajoPractico4
             int codigoMateria = 0;
             bool parseCodigoCurso = false;
             int codigoCurso = 0;
+            // Fin inscripcion
+
             #endregion
             bool seguienMenu = true;
             while (seguienMenu)
@@ -52,6 +64,22 @@ namespace TrabajoPractico4
                                     Alumnos buscarRegistro = ListadeAlumnos.Find(x => x.nroRegistro == numeroRegistro);
                                     if (ListadeAlumnos.Contains(buscarRegistro))
                                     {
+                                        List<Inscripciones> ListadeInscripciones = new();
+                                        ListadeInscripciones = Funciones.CargarInscripciones();
+                                        if (Funciones.ContarInscripciones(0) == 0)
+                                        {
+
+                                        }
+                                        else
+                                        {
+                                            if (ListadeInscripciones.Count(x => x.nroRegistro == numeroRegistro) >= 1)
+                                            {
+                                                Funciones.MostrarError("Usted ya esta inscripto a las materias.");
+                                                yaseInscribio = true;
+                                                break;
+                                            }
+                                        }
+                                       
                                         registro = true;
                                         Console.Clear();
                                         Console.WriteLine("Alumno: {0} {1}", buscarRegistro.nombre, buscarRegistro.apellido);
@@ -71,6 +99,8 @@ namespace TrabajoPractico4
                             } while (registro == false);
                             #endregion
 
+                            if (yaseInscribio == true) { break; }
+
                             #region Cuarta materia
                             //Comprobamos si quiere inscribirse a una 4ta materia
                             Console.WriteLine("¿Desea inscribirse a una cuarta materia? S/N");
@@ -80,13 +110,11 @@ namespace TrabajoPractico4
                                 cuartaMateria.Trim();
                                 if (cuartaMateria == "S" || cuartaMateria == "s")
                                 {
-                                    inscribeCuartaMateria = true;
                                     cicloFORcuartaMateria = 3;
                                     parseCuartaMateria = true;
                                 }
                                 else if (cuartaMateria == "N" || cuartaMateria == "n")
                                 {
-                                    inscribeCuartaMateria = false;
                                     cicloFORcuartaMateria = 2;
                                     parseCuartaMateria = true;
                                 }
@@ -148,8 +176,8 @@ namespace TrabajoPractico4
                                     // desplegamos lista de materias de esa carrera.
                                     Console.WriteLine("{0}({1})", buscarMaterias.nombreMateria,buscarMaterias.nroMateria);
                                  }
-                                Console.ReadLine();
-                                Console.WriteLine("Ingrese el codigo de la materia en la que se quiere anotar: \n");
+
+                                Console.WriteLine("\nIngrese el codigo de la materia en la que se quiere anotar: \n");
                                 do
                                 {
                                     if (Int32.TryParse(Console.ReadLine(), System.Globalization.NumberStyles.None, null, out codigoMateria))
@@ -192,6 +220,10 @@ namespace TrabajoPractico4
                                         }
                                                                          
                                     }
+                                    else
+                                    {
+                                        Funciones.MostrarError("Lo ingresado no es un numero valido. Ingrese nuevamente.");
+                                    }
 
                                 }
                                 while (parseCodigoMateria == false);
@@ -202,8 +234,8 @@ namespace TrabajoPractico4
                                     // desplegamos lista de cursos de esa materia.
                                     Console.WriteLine("Curso N° {0} | Tipo: {1} | Profesor: {2} | Horario: {3} | Sede: {4} | Catedra: {5}", buscarCursos.codigoCurso, buscarCursos.descripcionCurso, buscarCursos.nombreProfesor, buscarCursos.horarioCurso, buscarCursos.sedeCurso, buscarCursos.catedraCurso);
                                 }
-                                Console.ReadLine();
-                                Console.WriteLine("Ingrese el numero de curso en el que se quiere anotar: \n");
+
+                                Console.WriteLine("\nIngrese el numero de curso en el que se quiere anotar: \n");
                                 do
                                 {
                                     if (Int32.TryParse(Console.ReadLine(), System.Globalization.NumberStyles.None, null, out codigoCurso))
@@ -218,13 +250,19 @@ namespace TrabajoPractico4
                                             Funciones.MostrarError("No se ha encontrado un curso con ese codigo. Ingrese nuevamente. \n");
                                         }
                                     }
+                                    else
+                                    {
+                                        Funciones.MostrarError("Lo ingresado no es un numero valido. Ingrese nuevamente.");
+                                    }
                                 }
                                 while (parseCodigoCurso == false);
 
                                 //Ahora si, lo inscribimos.
 
                                 Funciones.ActualizarInscripciones(String.Format("{0},{1},{2},{3}",numeroRegistro,numerocarrera,codigoMateria,codigoCurso));
-
+                                parseCarreras = false;
+                                parseCodigoMateria = false;
+                                parseCodigoCurso = false;
 
 
 
@@ -239,6 +277,8 @@ namespace TrabajoPractico4
 
                             break;
                         case 2:  // certificado de inscripcion.
+
+
                             break;
                         case 3:
                             Funciones.salir();
