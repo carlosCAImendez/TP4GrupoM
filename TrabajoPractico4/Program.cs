@@ -346,7 +346,7 @@ namespace TrabajoPractico4
                             Console.ReadLine();
 
                             break;
-                        case 2:  // certificado de inscripcion.
+                        case 2:  // certificado de inscripcion. ///
                             Console.Clear();
                             Funciones.existenlasBases();
                             List<Alumnos> ListadeAlumnos2 = new();
