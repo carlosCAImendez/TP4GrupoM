@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 /*
  *        Trabajo Practico N° 4 - Inscripcion.
@@ -23,15 +24,20 @@ namespace TrabajoPractico4
             bool registro = false;
             bool yaseInscribio = false;
             // Fin nro registro verif.
-            bool parseCuartaMateria = false;
+            bool parseCuartaMateria = false;          
             string cuartaMateria;
             int cicloFORcuartaMateria = 0;
+            bool inscribiocuartaMateria = false;
+            bool parseCantidadMaterias = false;
+            int cantidadMaterias = 0;
             bool parseCarreras = false;
             int numerocarrera = 0;
             bool parseCodigoMateria = false;
             int codigoMateria = 0;
             bool parseCodigoCurso = false;
             int codigoCurso = 0;
+            bool parseFinalizarInscripcion = false;
+            string finalizarInscripcion;
             // Fin inscripcion
 
             #endregion
@@ -46,14 +52,15 @@ namespace TrabajoPractico4
                     {
                         case 1:
                             Console.Clear();
-                          Funciones.existenlasBases();
+                            Funciones.existenlasBases();
                             List<Alumnos> ListadeAlumnos = new();
                             ListadeAlumnos = Funciones.CargarAlumnos();
                             List<Materias> ListadeMaterias = new();
                             ListadeMaterias = Funciones.CargarMaterias();
                             List<Cursos> ListadeCursos = new();
                             ListadeCursos = Funciones.CargarCursos();
-                     
+                            List<Inscripciones> ListaInscripcionesProvisoria = new();
+
 
                             Console.WriteLine("Ingrese su numero de registro");
                             #region Buscar si el alumno existe en la bd
@@ -79,7 +86,7 @@ namespace TrabajoPractico4
                                                 break;
                                             }
                                         }
-                                       
+
                                         registro = true;
                                         Console.Clear();
                                         Console.WriteLine("Alumno: {0} {1}", buscarRegistro.nombre, buscarRegistro.apellido);
@@ -88,7 +95,7 @@ namespace TrabajoPractico4
                                     else
                                     {
                                         Funciones.MostrarError("El numero de registro no se encuentra en la base de datos. Ingrese nuevamente.");
-                                        
+
                                     }
 
                                 }
@@ -103,7 +110,7 @@ namespace TrabajoPractico4
 
                             #region Cuarta materia
                             //Comprobamos si quiere inscribirse a una 4ta materia
-                            Console.WriteLine("¿Desea inscribirse a una cuarta materia? S/N");
+                            Console.WriteLine("¿Desea inscribirse a una cuarta materia o esta en las ultimas cuatro materias? S/N");
                             do
                             {
                                 cuartaMateria = Console.ReadLine();
@@ -111,11 +118,13 @@ namespace TrabajoPractico4
                                 if (cuartaMateria == "S" || cuartaMateria == "s")
                                 {
                                     cicloFORcuartaMateria = 3;
+                                    inscribiocuartaMateria = true;
                                     parseCuartaMateria = true;
                                 }
                                 else if (cuartaMateria == "N" || cuartaMateria == "n")
                                 {
                                     cicloFORcuartaMateria = 2;
+                                    inscribiocuartaMateria = false;
                                     parseCuartaMateria = true;
                                 }
                                 else
@@ -126,6 +135,32 @@ namespace TrabajoPractico4
                             }
                             while (parseCuartaMateria == false);
                             #endregion
+
+                            //Comprobamos a cuantas se quiere inscribir, si selecciono la cuarta materia no hacemos esto.
+                          if (inscribiocuartaMateria == false)
+                          { 
+                            Console.WriteLine("A cuantas materias desea inscribirse?");
+                            do
+                            {
+                                if (Int32.TryParse(Console.ReadLine(), System.Globalization.NumberStyles.None, null, out cantidadMaterias))
+                                {
+                                    if (cantidadMaterias == 0 || cantidadMaterias > 3)
+                                    {
+                                        Funciones.MostrarError("La cantidad de materias no puede ser 0, ni mayor a 3. Ingrese nuevamente.");
+                                    }
+                                    else
+                                    {
+                                            cicloFORcuartaMateria = cantidadMaterias - 1;
+                                            parseCantidadMaterias = true;
+                                    }
+                                }
+                                else
+                                {
+                                    Funciones.MostrarError("Lo ingresado no es un numero valido. Ingrese nuevamente.");
+                                }
+                            }
+                            while (parseCantidadMaterias == false);
+                          }
 
                             for (int i = 0; i <= cicloFORcuartaMateria; i++)
                             {
@@ -182,26 +217,14 @@ namespace TrabajoPractico4
                                 {
                                     if (Int32.TryParse(Console.ReadLine(), System.Globalization.NumberStyles.None, null, out codigoMateria))
                                     {
-                                        Materias buscarCodigo = ListadeMaterias.Find(x => x.nroMateria == codigoMateria);
-                                        // Con esto chequeamos que el tipo no se quiera inscribir 2 veces a la misma materia.
-                                        if (Funciones.ContarInscripciones(0) == 0)
-                                        {
-                                            if (ListadeMaterias.Contains(buscarCodigo))
-                                            {
-                                                parseCodigoMateria = true;
 
-                                            }
-                                            else
-                                            {
-                                                Funciones.MostrarError("No se ha encontrado una materia con ese codigo. Ingrese nuevamente. \n");
-                                            }
-                                        }
-                                        else 
-                                        {
-                                            List<Inscripciones> ListadeInscripciones = new();
-                                            ListadeInscripciones = Funciones.CargarInscripciones();
-                                            Inscripciones buscarInscripciones = ListadeInscripciones.Find(x => (x.nroMateria == codigoMateria) && (x.nroRegistro == numeroRegistro));
-                                            if (ListadeInscripciones.Contains(buscarInscripciones))
+                                        Materias buscarCodigo = ListadeMaterias.Find(x => x.nroMateria == codigoMateria);
+                                          // Con esto chequeamos que el tipo no se quiera inscribir 2 veces a la misma materia.
+                                       
+                                          //  List<Inscripciones> ListadeInscripciones = new();
+                                           // ListadeInscripciones = Funciones.CargarInscripciones();
+                                            Inscripciones buscarInscripciones = ListaInscripcionesProvisoria.Find(x => (x.nroMateria == codigoMateria) && (x.nroRegistro == numeroRegistro));
+                                            if (ListaInscripcionesProvisoria.Contains(buscarInscripciones))
                                             {
                                                 Funciones.MostrarError("No podes inscribirte 2 veces a la misma materia. Ingrese nuevamente. \n");
                                             }
@@ -217,7 +240,7 @@ namespace TrabajoPractico4
                                                     Funciones.MostrarError("No se ha encontrado una materia con ese codigo. Ingrese nuevamente. \n");
                                                 }
                                             }
-                                        }
+                                        
                                                                          
                                     }
                                     else
@@ -257,29 +280,154 @@ namespace TrabajoPractico4
                                 }
                                 while (parseCodigoCurso == false);
 
-                                //Ahora si, lo inscribimos.
-
-                                Funciones.ActualizarInscripciones(String.Format("{0},{1},{2},{3}",numeroRegistro,numerocarrera,codigoMateria,codigoCurso));
+                                //Lo guardamos en una lista hasta que confirme.
+                                ListaInscripcionesProvisoria.Add(new Inscripciones() { nroRegistro = numeroRegistro, nroCarrera = numerocarrera, nroMateria = codigoMateria, codigoCurso = codigoCurso });
+                                
                                 parseCarreras = false;
                                 parseCodigoMateria = false;
                                 parseCodigoCurso = false;
+                                registro = false;
+                                parseCantidadMaterias = false;
+                                parseCuartaMateria = false;
+                                yaseInscribio = false;
+                                inscribiocuartaMateria = false;
+                                
 
-
-
-                                Console.ReadLine();
                                 Console.Clear();
 
                               
                             }
 
+                            Console.WriteLine("Se estaría inscribiendo a las siguientes materias: ¿Desea confirmar? S/N \n");
+                 
+                                foreach (var item in ListaInscripcionesProvisoria)
+                                {
+                                    string materia = ListadeMaterias.Find(x => x.nroMateria == item.nroMateria).nombreMateria;
+                                string cursoProfe = ListadeCursos.Find(x => (x.codigoCurso == item.codigoCurso) && (x.codigoMateria == item.nroMateria)).nombreProfesor;
+                                    string sede = ListadeCursos.Find(x => x.codigoCurso == item.codigoCurso && (x.codigoMateria == item.nroMateria)).sedeCurso;
+                                    string horario = ListadeCursos.Find(x => x.codigoCurso == item.codigoCurso && (x.codigoMateria == item.nroMateria)).horarioCurso;
+                                    string modalidad = ListadeCursos.Find(x => x.codigoCurso == item.codigoCurso && (x.codigoMateria == item.nroMateria)).descripcionCurso;
 
+                                    Console.WriteLine("Materia: {0} \n Profesor: {1} Sede: {2} Horario: {3} Modalidad: {4}", materia, cursoProfe, sede, horario, modalidad);
+                                }
+                            
+                            do
+                            {
+                                finalizarInscripcion = Console.ReadLine();
+                                finalizarInscripcion.Trim();
+
+                                if (finalizarInscripcion == "S" || finalizarInscripcion == "s")
+                                {
+                                    //Ahora si, lo inscribimos.
+                                   
+                                    foreach (var item in ListaInscripcionesProvisoria)
+                                    {
+                                        Funciones.ActualizarInscripciones(String.Format("{0},{1},{2},{3}", item.nroRegistro, item.nroCarrera, item.nroMateria, item.codigoCurso));
+                                    }
+                                    Console.WriteLine("Se ha inscripto correctamente a las materias.");
+                                    parseFinalizarInscripcion = true;
+
+                                }
+                                else if (finalizarInscripcion == "N" || finalizarInscripcion == "n")
+                                {
+                                    ListaInscripcionesProvisoria.Clear();
+                                    parseFinalizarInscripcion = true;
+                                    break;
+                                }
+                                else
+                                {
+                                    Funciones.MostrarError("Lo ingresado no es una opcion correcta. Ingrese nuevamente.");
+                                }
+
+
+                            } while (parseFinalizarInscripcion == false);
+
+                            parseFinalizarInscripcion = false;
                             Console.ReadLine();
 
                             break;
                         case 2:  // certificado de inscripcion.
+                            Console.Clear();
+                            Funciones.existenlasBases();
+                            List<Alumnos> ListadeAlumnos2 = new();
+                            ListadeAlumnos2 = Funciones.CargarAlumnos();
+                            List<Materias> ListadeMaterias2 = new();
+                            ListadeMaterias2 = Funciones.CargarMaterias();
+                            List<Cursos> ListadeCursos2 = new();
+                            ListadeCursos2 = Funciones.CargarCursos();
+
+                            Console.WriteLine("Ingrese su numero de registro");
+                            #region Buscar si el alumno existe en la bd
+                            do
+                            {
+                                if (Int32.TryParse(Console.ReadLine(), System.Globalization.NumberStyles.None, null, out numeroRegistro))
+                                {
+                                    Alumnos buscarRegistro = ListadeAlumnos2.Find(x => x.nroRegistro == numeroRegistro);
+                                    if (ListadeAlumnos2.Contains(buscarRegistro))
+                                    {
+                                        List<Inscripciones> ListadeInscripciones = new();
+                                        ListadeInscripciones = Funciones.CargarInscripciones();
+                                        if (Funciones.ContarInscripciones(0) == 0)
+                                        {
+                                            Funciones.MostrarError("Usted no esta inscripto a las materias.");
+                                        }
+                                        else
+                                        {
+                                            if (ListadeInscripciones.Count(x => x.nroRegistro == numeroRegistro) >= 1)
+                                            {
+                                                registro = true;
+                                                Console.Clear();
+                                                Console.WriteLine("Alumno: {0} {1}", buscarRegistro.nombre, buscarRegistro.apellido);
+                                                Console.WriteLine("Certificado de inscripcion");
+                                                string direccion = Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location), "certificado" + numeroRegistro +  ".txt");
+                                                FileInfo certificado = new FileInfo(direccion);
+                                                if (certificado.Exists)
+                                                {
+                                                    Funciones.MostrarError("Ya existe un certificado de inscripción generado.");
+                                                    break;
+                                                }
+                                                File.Create(direccion).Dispose();
+                                                StreamWriter actualizador = new StreamWriter(direccion, true);
+                                                actualizador.WriteLine("|Cod|Materia|Curso|Tipo|Titular|Docente|Dias y horarios|Sede|");
+                                                foreach (var item in ListadeInscripciones)
+                                                {
+                                                    string materia = ListadeMaterias2.Find(x => x.nroMateria == item.nroMateria).nombreMateria;
+                                                    string cursoProfe = ListadeCursos2.Find(x => (x.codigoCurso == item.codigoCurso) && (x.codigoMateria == item.nroMateria)).nombreProfesor;
+                                                    string sede = ListadeCursos2.Find(x => x.codigoCurso == item.codigoCurso && (x.codigoMateria == item.nroMateria)).sedeCurso;
+                                                    string horario = ListadeCursos2.Find(x => x.codigoCurso == item.codigoCurso && (x.codigoMateria == item.nroMateria)).horarioCurso;
+                                                    string modalidad = ListadeCursos2.Find(x => x.codigoCurso == item.codigoCurso && (x.codigoMateria == item.nroMateria)).descripcionCurso;
+                                                    string catedra = ListadeCursos2.Find(x => x.codigoCurso == item.codigoCurso && (x.codigoMateria == item.nroMateria)).catedraCurso;
+
+                                                    Console.WriteLine("Materia: {0} \n Profesor: {1} Sede: {2} Horario: {3} Modalidad: {4}", materia, cursoProfe, sede, horario, modalidad);
+                                                    actualizador.WriteLine("|{0}|{1}|{2}|{3}|{4}|{5}|{6}|{7}", item.nroMateria, materia, item.codigoCurso, modalidad, catedra,cursoProfe,horario,sede );
+                                                  
+                                                }
+                                                actualizador.Close();
+                                                Console.WriteLine("\nCertificado de inscripción generado.");
+
+                                            }
+                                        }
+
+                                     
 
 
+                                    }
+                                    else
+                                    {
+                                        Funciones.MostrarError("El numero de registro no se encuentra en la base de datos. Ingrese nuevamente.");
+
+                                    }
+
+                                }
+                                else
+                                {
+                                    Funciones.MostrarError("Lo ingresado no es un numero valido. Ingrese nuevamente.");
+                                }
+                            } while (registro == false);
+                            #endregion
+                            Console.WriteLine();
                             break;
+
                         case 3:
                             Funciones.salir();
                             break;
