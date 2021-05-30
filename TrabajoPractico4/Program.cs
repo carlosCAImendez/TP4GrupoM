@@ -363,11 +363,17 @@ namespace TrabajoPractico4
                                 if (Int32.TryParse(Console.ReadLine(), System.Globalization.NumberStyles.None, null, out numeroRegistro))
                                 {
                                     Alumnos buscarRegistro = ListadeAlumnos2.Find(x => x.nroRegistro == numeroRegistro);
+
                                     if (ListadeAlumnos2.Contains(buscarRegistro))
                                     {
                                         List<Inscripciones> ListadeInscripciones = new();
                                         ListadeInscripciones = Funciones.CargarInscripciones();
+                                        Inscripciones buscarSiseinscribio = ListadeInscripciones.Find(x => x.nroRegistro == numeroRegistro);
                                         if (Funciones.ContarInscripciones(0) == 0)
+                                        {
+                                            Funciones.MostrarError("Usted no esta inscripto a las materias.");
+                                        }
+                                        else if (!ListadeInscripciones.Contains(buscarSiseinscribio))
                                         {
                                             Funciones.MostrarError("Usted no esta inscripto a las materias.");
                                         }
@@ -378,7 +384,7 @@ namespace TrabajoPractico4
                                                 registro = true;
                                                 Console.Clear();
                                                 Console.WriteLine("Alumno: {0} {1}", buscarRegistro.nombre, buscarRegistro.apellido);
-                                                Console.WriteLine("Certificado de inscripcion");
+                                                Console.WriteLine("Certificado de inscripcion:");
                                                 string direccion = Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location), "certificado" + numeroRegistro +  ".txt");
                                                 FileInfo certificado = new FileInfo(direccion);
                                                 if (certificado.Exists)
@@ -389,9 +395,9 @@ namespace TrabajoPractico4
                                                 File.Create(direccion).Dispose();
                                                 StreamWriter actualizador = new StreamWriter(direccion, true);
                                                 actualizador.WriteLine("|Cod|Materia|Curso|Tipo|Titular|Docente|Dias y horarios|Sede|");
-                                                foreach (var item in ListadeInscripciones)
+                                                foreach (var item in ListadeInscripciones.Where(x=> x.nroRegistro == numeroRegistro))
                                                 {
-                                                    string materia = ListadeMaterias2.Find(x => x.nroMateria == item.nroMateria).nombreMateria;
+                                                    string materia = ListadeMaterias2.Find(x => (x.nroMateria == item.nroMateria)).nombreMateria;
                                                     string cursoProfe = ListadeCursos2.Find(x => (x.codigoCurso == item.codigoCurso) && (x.codigoMateria == item.nroMateria)).nombreProfesor;
                                                     string sede = ListadeCursos2.Find(x => x.codigoCurso == item.codigoCurso && (x.codigoMateria == item.nroMateria)).sedeCurso;
                                                     string horario = ListadeCursos2.Find(x => x.codigoCurso == item.codigoCurso && (x.codigoMateria == item.nroMateria)).horarioCurso;
