@@ -111,7 +111,7 @@ namespace TrabajoPractico4
 
                             #region Cuarta materia
                             //Comprobamos si quiere inscribirse a una 4ta materia
-                            Console.WriteLine("¿Desea inscribirse a una cuarta materia o esta en las ultimas cuatro materias? S/N");
+                            Console.WriteLine("¿Desea inscribirse a una cuarta materia? S/N");
                             do
                             {
                                 cuartaMateria = Console.ReadLine();
