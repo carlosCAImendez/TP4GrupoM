@@ -16,6 +16,6 @@ namespace TrabajoPractico4
         public string email { get; set; }
         public int nroCarrera { get; set; }
 
-
+       
     }
 }

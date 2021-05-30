@@ -51,6 +51,7 @@ namespace TrabajoPractico4
                     switch (opcion)
                     {
                         case 1:
+                            yaseInscribio = false;
                             Console.Clear();
                             Funciones.existenlasBases();
                             List<Alumnos> ListadeAlumnos = new();
