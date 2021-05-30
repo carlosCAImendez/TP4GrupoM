@@ -270,7 +270,7 @@ namespace TrabajoPractico4
                                         }
                                         else 
                                         {
-                                            Funciones.MostrarError("No se ha encontrado un curso con ese codigo. Ingrese nuevamente. \n");
+                                            Funciones.MostrarError("No se ha encontrado un curso con ese numero. Ingrese nuevamente. \n");
                                         }
                                     }
                                     else
