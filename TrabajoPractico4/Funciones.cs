@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Net;
+using System.Reflection;
 
 namespace TrabajoPractico4
 {
@@ -14,47 +15,36 @@ namespace TrabajoPractico4
         #region Cargar bases de datos
         public static List<Alumnos> CargarAlumnos()
         {
-            List<Alumnos> ListadeAlumnos = new();
-            string direccionAlumnos = Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location), "alumnos.txt");
+            List<Alumnos> ListadeAlumnos = new List<Alumnos>();
+            string direccionAlumnos = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "alumnos.txt");
             FileInfo archivobdAlumnos = new FileInfo(direccionAlumnos);
             try
             {
                 StreamReader abridor = archivobdAlumnos.OpenText();
                 if (archivobdAlumnos.Length == 0)
                 {
-                    Funciones.MostrarError("La base de datos de alumnos esta vacia. Descargandola...");
-                    using (WebClient wc = new WebClient())
+                    Funciones.MostrarError("No se encuentra la base de datos de alumnos. No se puede continuar.");
+                    Console.ReadLine();
+                    Environment.Exit(0);
+                }
+                while (!abridor.EndOfStream)
+                {
+                    string Linea = abridor.ReadLine();
+                    string[] Vector = Linea.Split(',');
+                    if (!(Vector[0] == "Registro") || !(Vector[1] == "Nombre") || !(Vector[2] == "Apellido") || !(Vector[3] == "Dni") || !(Vector[4] == "Email") || !(Vector[5] == "Carrera"))
                     {
-                        wc.DownloadFileAsync(new System.Uri("http://www.sayka.com/downloads/front_view.jpg"), Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location), "alumnos.txt"));
+                        Alumnos A = new Alumnos();
+                        A.nroRegistro = int.Parse(Vector[0]);
+                        A.nombre = Vector[1];
+                        A.apellido = Vector[2];
+                        A.nroDNI = int.Parse(Vector[3]);
+                        A.email = Vector[4];
+                        A.nroCarrera = int.Parse(Vector[5]);
+                        ListadeAlumnos.Add(A);
                     }
                 }
-                    while (!abridor.EndOfStream)
-                    {
-                        string Linea = abridor.ReadLine();
-
-                        string[] Vector = Linea.Split(',');
-                        if (Vector[0] == "Registro" && Vector[1] == "Nombre" && Vector[2] == "Apellido" && Vector[3] == "Dni" && Vector[4] == "Email" && Vector[5] == "Carrera")
-                        {
-                            // Con esto nos salteamos la primera linea.
-                        }
-                        else
-                        {
-                            Alumnos A = new Alumnos();
-                            A.nroRegistro = Int32.Parse(Vector[0]);
-                            A.nombre = Vector[1];
-                            A.apellido = Vector[2];
-                            A.nroDNI = Int32.Parse(Vector[3]);
-                            A.email = Vector[4];
-                            A.nroCarrera = Int32.Parse(Vector[5]);
-                            ListadeAlumnos.Add(A);
-
-
-                        }
-                    }
-                    abridor.Close();
-                    return ListadeAlumnos;
-
-                
+                abridor.Close();
+                return ListadeAlumnos;
             }
             catch (IOException e)
             {
@@ -63,49 +53,38 @@ namespace TrabajoPractico4
                 Environment.Exit(0);
                 return null;
             }
-
-
         }
+
         public static List<Materias> CargarMaterias()
         {
-            List<Materias> ListadeMaterias = new();
-            string direccionMaterias = Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location), "materias.txt");
+            List<Materias> ListadeMaterias = new List<Materias>();
+            string direccionMaterias = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "materias.txt");
             FileInfo archivobdMaterias = new FileInfo(direccionMaterias);
             try
             {
                 StreamReader abridor = archivobdMaterias.OpenText();
                 if (archivobdMaterias.Length == 0)
                 {
-                    Funciones.MostrarError("La base de datos de materias esta vacia. Descargandola...");
-                    using (WebClient wc = new WebClient())
-                    {
-                        wc.DownloadFileAsync(new System.Uri("http://www.sayka.com/downloads/front_view.jpg"), Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location), "materias.txt"));
-                    }
+                    Funciones.MostrarError("No se encuentra la base de datos de alumnos. No se puede continuar.");
+                    Console.ReadLine();
+                    Environment.Exit(0);
+
                 }
                 while (!abridor.EndOfStream)
                 {
                     string Linea = abridor.ReadLine();
-
                     string[] Vector = Linea.Split(',');
-                    if (Vector[0] == "NumeroDeMateria" && Vector[1] == "NumeroDeCarrera" && Vector[2] == "Nombre")
-                    {
-                        // Con esto nos salteamos la primera linea.
-                    }
-                    else
+                    if (!(Vector[0] == "NumeroDeMateria") || !(Vector[1] == "NumeroDeCarrera") || !(Vector[2] == "Nombre"))
                     {
                         Materias A = new Materias();
-                        A.nroMateria = Int32.Parse(Vector[0]);
-                        A.nroCarrera = Int32.Parse(Vector[1]);
+                        A.nroMateria = int.Parse(Vector[0]);
+                        A.nroCarrera = int.Parse(Vector[1]);
                         A.nombreMateria = Vector[2];
                         ListadeMaterias.Add(A);
-
-
                     }
                 }
                 abridor.Close();
                 return ListadeMaterias;
-
-
             }
             catch (IOException e)
             {
@@ -114,9 +93,8 @@ namespace TrabajoPractico4
                 Environment.Exit(0);
                 return null;
             }
-
-
         }
+
         public static List<Cursos> CargarCursos()
         {
             List<Cursos> ListadeCursos = new();
@@ -127,11 +105,9 @@ namespace TrabajoPractico4
                 StreamReader abridor = archivobdCursos.OpenText();
                 if (archivobdCursos.Length == 0)
                 {
-                    Funciones.MostrarError("La base de datos de cursos esta vacia. Descargandola...");
-                    using (WebClient wc = new WebClient())
-                    {
-                        wc.DownloadFileAsync(new System.Uri("http://www.sayka.com/downloads/front_view.jpg"), Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location), "cursos.txt"));
-                    }
+                    Funciones.MostrarError("No se encuentra la base de datos de alumnos. No se puede continuar.");
+                    Console.ReadLine();
+                    Environment.Exit(0);
                 }
                 while (!abridor.EndOfStream)
                 {
