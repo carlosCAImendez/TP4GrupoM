@@ -332,6 +332,7 @@ namespace TrabajoPractico4
                                 else if (finalizarInscripcion == "N" || finalizarInscripcion == "n")
                                 {
                                     ListaInscripcionesProvisoria.Clear();
+                                    Console.WriteLine("No se ha registrado la solicitud.");
                                     parseFinalizarInscripcion = true;
                                     break;
                                 }
