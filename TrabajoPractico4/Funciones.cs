@@ -229,20 +229,16 @@ namespace TrabajoPractico4
             FileInfo elPlan5 = new FileInfo(direccionMaterias);
             if (!elPlan.Exists)
             {
-                Funciones.MostrarError("No se encuentra la base de datos de alumnos. Descargandola...");
-                using (WebClient wc = new WebClient())
-                {
-                    wc.DownloadFileAsync(new System.Uri("http://www.sayka.com/downloads/front_view.jpg"), Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location), "alumnos.txt"));
-                }
+                Funciones.MostrarError("No se encuentra la base de datos de alumnos. No se puede continuar.");
+                Console.ReadLine();
+                Environment.Exit(0);
 
             }
             if (!elPlan3.Exists)
             {
-                Funciones.MostrarError("No se encuentra la base de datos de cursos. Descargandola...");
-                using (WebClient wc = new WebClient())
-                {
-                    wc.DownloadFileAsync(new System.Uri("http://www.sayka.com/downloads/front_view.jpg"), Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location), "cursos.txt"));
-                }
+                Funciones.MostrarError("No se encuentra la base de datos de cursos. No se puede continuar.");
+                Console.ReadLine();
+                Environment.Exit(0);
 
             }
             if (!elPlan4.Exists)
@@ -254,18 +250,18 @@ namespace TrabajoPractico4
                 }
                 catch
                 {
-                    Funciones.MostrarError("No se pudo crear la base de datos de inscripciones.");
+                    Funciones.MostrarError("No se pudo crear la base de datos de inscripciones. No se puede continuar.");
+                    Console.ReadLine();
+                    Environment.Exit(0);
                 }
 
 
             }
             if (!elPlan5.Exists)
             {
-                Funciones.MostrarError("No se encuentra la base de datos de materias. Descargandola...");
-                using (WebClient wc = new WebClient())
-                {
-                    wc.DownloadFileAsync(new System.Uri("http://www.sayka.com/downloads/front_view.jpg"), Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location), "materias.txt"));
-                }
+                Funciones.MostrarError("No se encuentra la base de datos de materias. No se puede continuar.");
+                Console.ReadLine();
+                Environment.Exit(0);
 
             }
 
