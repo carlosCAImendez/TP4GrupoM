@@ -15,7 +15,8 @@ namespace TrabajoPractico4
         public int nroDNI { get; set; }
         public string email { get; set; }
         public int nroCarrera { get; set; }
+        //public bool AproboMaterias { get; set; }
 
-       
+
     }
 }

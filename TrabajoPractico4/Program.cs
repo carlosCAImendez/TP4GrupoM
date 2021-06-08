@@ -24,6 +24,9 @@ namespace TrabajoPractico4
             bool registro = false;
             bool yaseInscribio = false;
             // Fin nro registro verif.
+            bool parseUltimascuatro = false;
+            bool estaenUltimas4 = false;
+            string ultimasCuatro;
             bool parseCuartaMateria = false;          
             string cuartaMateria;
             int cicloFORcuartaMateria = 0;
@@ -52,6 +55,8 @@ namespace TrabajoPractico4
                     {
                         case 1:
                             yaseInscribio = false;
+                            parseUltimascuatro = false;
+                            estaenUltimas4 = false;
                             Console.Clear();
                             Funciones.existenlasBases();
                             List<Alumnos> ListadeAlumnos = new();
@@ -61,6 +66,11 @@ namespace TrabajoPractico4
                             List<Cursos> ListadeCursos = new();
                             ListadeCursos = Funciones.CargarCursos();
                             List<Inscripciones> ListaInscripcionesProvisoria = new();
+                            List<MateriasAprobadas> ListadeMateriasAprobadas = new();
+                            ListadeMateriasAprobadas = Funciones.CargarMateriasAprobadas();
+                            List<Correlativas> ListadeCorrelativas = new();
+                            ListadeCorrelativas = Correlativas.ListaCorrelativas();
+
 
 
                             Console.WriteLine("Ingrese su numero de registro");
@@ -108,6 +118,31 @@ namespace TrabajoPractico4
                             #endregion
 
                             if (yaseInscribio == true) { break; }
+
+                            Console.WriteLine("¿Se encuentra en las ultimas 4 materias? S/N");
+                            do
+                            {
+                                string resp;
+                                resp = Console.ReadLine();
+                                ultimasCuatro = resp.Trim();
+                                if (ultimasCuatro == "S" || ultimasCuatro == "s")
+                                {
+                                    estaenUltimas4 = true;
+                                    parseUltimascuatro = true;
+                                }
+                                else if (ultimasCuatro == "N" || ultimasCuatro == "n")
+                                {
+
+                                    estaenUltimas4 = false;
+                                    parseUltimascuatro = true;
+                                }
+                                else
+                                {
+                                    Funciones.MostrarError("Lo ingresado no es una opcion correcta. Ingrese nuevamente.");
+                                }
+
+                            }
+                            while (parseUltimascuatro == false);
 
                             #region Cuarta materia
                             //Comprobamos si quiere inscribirse a una 4ta materia
@@ -163,6 +198,10 @@ namespace TrabajoPractico4
                             while (parseCantidadMaterias == false);
                           }
 
+                          // Cargamos la lista de materias aprobadas para generar la oferta segun correlatividades.
+                          // 
+
+
                             for (int i = 0; i <= cicloFORcuartaMateria; i++)
                             {
                                 Console.Clear();
@@ -206,12 +245,22 @@ namespace TrabajoPractico4
                                 }
                                 while (parseCarreras == false);
 
-                                Console.WriteLine("Las materias disponibles para la carrera {0} son: \n ", Funciones.MostrarCarrera(numerocarrera));
+
+                                Console.WriteLine("Las materias que tiene disponibles para la carrera {0} son: \n ", Funciones.MostrarCarrera(numerocarrera));
                                  foreach ( var buscarMaterias in ListadeMaterias.Where(x => (x.nroCarrera == numerocarrera)))
                                  {
+                                    // 
+                                    MateriasAprobadas buscarAprobadas = ListadeMateriasAprobadas.Find(x => (x.nroRegistro == numeroRegistro) && (x.nroMateria == buscarMaterias.nroMateria));
+                                    if (ListadeMateriasAprobadas.Contains(buscarAprobadas))
+                                    {
+                                        // Con esto nos evitamos que liste las que ya aprobamos.
+                                    }
+                                    else
+                                    { 
                                     // desplegamos lista de materias de esa carrera.
                                     Console.WriteLine("{0}({1})", buscarMaterias.nombreMateria,buscarMaterias.nroMateria);
-                                 }
+                                    }
+                                }
 
                                 Console.WriteLine("\nIngrese el codigo de la materia en la que se quiere anotar: \n");
                                 do
@@ -220,20 +269,84 @@ namespace TrabajoPractico4
                                     {
 
                                         Materias buscarCodigo = ListadeMaterias.Find(x => x.nroMateria == codigoMateria);
-                                          // Con esto chequeamos que el tipo no se quiera inscribir 2 veces a la misma materia.
-                                       
-                                          //  List<Inscripciones> ListadeInscripciones = new();
-                                           // ListadeInscripciones = Funciones.CargarInscripciones();
-                                            Inscripciones buscarInscripciones = ListaInscripcionesProvisoria.Find(x => (x.nroMateria == codigoMateria) && (x.nroRegistro == numeroRegistro));
-                                            if (ListaInscripcionesProvisoria.Contains(buscarInscripciones))
+                                        // Con esto chequeamos que el tipo no se quiera inscribir 2 veces a la misma materia. Lo chequeamos con la lista provisoria, no el archivo.
+                                        Inscripciones buscarInscripciones = ListaInscripcionesProvisoria.Find(x => (x.nroMateria == codigoMateria) && (x.nroRegistro == numeroRegistro));
+
+                                        if (ListaInscripcionesProvisoria.Contains(buscarInscripciones))
+                                        {
+                                            Funciones.MostrarError("No podes inscribirte 2 veces a la misma materia. Ingrese nuevamente. \n");
+                                        }
+                                        else
+                                        {
+                                            if (ListadeMaterias.Contains(buscarCodigo))
                                             {
-                                                Funciones.MostrarError("No podes inscribirte 2 veces a la misma materia. Ingrese nuevamente. \n");
-                                            }
-                                            else
-                                            {
-                                                if (ListadeMaterias.Contains(buscarCodigo))
+                                                MateriasAprobadas buscarAprobadas = ListadeMateriasAprobadas.Find(x => (x.nroRegistro == numeroRegistro) && (x.nroMateria == codigoMateria));
+                                                if (ListadeMateriasAprobadas.Contains(buscarAprobadas))
                                                 {
-                                                    parseCodigoMateria = true;
+                                                    Funciones.MostrarError("No podes inscribirte en una materia que ya tenes aprobada. \n");
+
+                                                }
+                                                else
+                                                {
+                                                    if (estaenUltimas4 == true)
+                                                    {
+                                                        parseCodigoMateria = true;
+                                                    }
+                                                    else
+                                                    {
+                                                        Correlativas buscarCorrelativas = ListadeCorrelativas.Find(x => (x.nroMateria == codigoMateria));
+                                                        int correla1 = buscarCorrelativas.correlativa1;
+                                                        int correla2 = buscarCorrelativas.correlativa2;
+                                                     
+                                                        //Ahora chequeamos si tiene aprobadas las correlativas.
+                                                        if (correla1 == 0) { parseCodigoMateria = true; } // La materia no tiene correlatividades.
+                                                        if (correla2 == 0 && correla1 != 0) // Solo tiene una correlativa
+                                                        {
+                                                            MateriasAprobadas buscarAprobadasCorrelativas = ListadeMateriasAprobadas.Find(x => (x.nroRegistro == numeroRegistro) && (x.nroMateria == correla1)); 
+
+                                                            if (ListadeMateriasAprobadas.Contains(buscarAprobadasCorrelativas))
+                                                            {
+                                                                parseCodigoMateria = true;
+                                                            }
+                                                            else
+                                                            {
+                                                                Materias buscarNombredeMateria = ListadeMaterias.Find(x => x.nroMateria == correla1);
+                                                                Funciones.MostrarError("No podes inscribirte porque no tenes la correlativa aprobada.");
+                                                                Funciones.MostrarError("Te falta aprobar: ");
+                                                                Funciones.MostrarError(String.Format("{0} ({1}) \n", buscarNombredeMateria.nombreMateria, buscarNombredeMateria.nroMateria));
+                                                            }
+
+                                                        }
+                                                        if (correla1 != 0 && correla2 != 0)  //Tiene dos correlativas
+                                                        {
+                                                            MateriasAprobadas buscarAprobadasCorrelativa1 = ListadeMateriasAprobadas.Find(x => (x.nroRegistro == numeroRegistro) && (x.nroMateria == correla1));
+                                                            MateriasAprobadas buscarAprobadasCorrelativa2 = ListadeMateriasAprobadas.Find(x => (x.nroRegistro == numeroRegistro) && (x.nroMateria == correla2));
+
+                                                            if (ListadeMateriasAprobadas.Contains(buscarAprobadasCorrelativa1) && ListadeMateriasAprobadas.Contains(buscarAprobadasCorrelativa2))
+                                                            {
+                                                                // Las tiene aprobadas las 2.
+                                                                parseCodigoMateria = true;
+                                                            }
+                                                            else
+                                                            {
+                                                                Materias buscarNombredeMateria1 = ListadeMaterias.Find(x => x.nroMateria == correla1);
+                                                                Materias buscarNombredeMateria2 = ListadeMaterias.Find(x => x.nroMateria == correla2);
+                                                                Funciones.MostrarError("No podes inscribirte porque no tenes las correlativas aprobadas.");
+                                                                Funciones.MostrarError("Te falta aprobar: ");
+                                                                Funciones.MostrarError(String.Format("{0} ({1})", buscarNombredeMateria1.nombreMateria, buscarNombredeMateria1.nroMateria));
+                                                                Funciones.MostrarError(String.Format("{0} ({1}) \n", buscarNombredeMateria2.nombreMateria, buscarNombredeMateria2.nroMateria));
+                                                            }
+
+                                                        }
+
+                                                        
+
+
+                                                        }
+                                                    }
+                                                    
+
+                                                  
 
                                                 }
                                                 else
@@ -292,7 +405,7 @@ namespace TrabajoPractico4
                                 parseCuartaMateria = false;
                                 yaseInscribio = false;
                                 inscribiocuartaMateria = false;
-                                
+                              
 
                                 Console.Clear();
 
@@ -345,6 +458,7 @@ namespace TrabajoPractico4
                             } while (parseFinalizarInscripcion == false);
 
                             parseFinalizarInscripcion = false;
+                            estaenUltimas4 = false;
                             Console.ReadLine();
 
                             break;

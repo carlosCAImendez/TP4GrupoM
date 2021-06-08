@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace TrabajoPractico4
 {
-    class Materias
+    class MateriasAprobadas
     {
+       
+        public int nroRegistro { get; set; }
         public int nroMateria { get; set; }
-        public int nroCarrera { get; set; }
-        public string nombreMateria { get; set; }
 
 
     }

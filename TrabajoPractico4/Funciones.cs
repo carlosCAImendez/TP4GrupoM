@@ -81,6 +81,7 @@ namespace TrabajoPractico4
                         A.nroCarrera = int.Parse(Vector[1]);
                         A.nombreMateria = Vector[2];
                         ListadeMaterias.Add(A);
+                        
                     }
                 }
                 abridor.Close();
@@ -193,16 +194,70 @@ namespace TrabajoPractico4
 
 
         }
+        public static List<MateriasAprobadas> CargarMateriasAprobadas()
+        {
+         
+            List<MateriasAprobadas> ListadeAprobadas = new();
+            string direccionAprobadas = Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location), "materiasAprobadas.txt");
+            FileInfo archivobdAprobadas = new FileInfo(direccionAprobadas);
+            try
+            {
+                StreamReader abridor = archivobdAprobadas.OpenText();
+                if (archivobdAprobadas.Length == 0)
+                {
+                    Funciones.MostrarError("No se encuentra la base de datos de materias aprobadas. No se puede continuar.");
+                    Console.ReadLine();
+                    Environment.Exit(0);
+                }
+                while (!abridor.EndOfStream)
+                {
+                    string Linea = abridor.ReadLine();
+
+                    string[] Vector = Linea.Split(',');
+                    if (Vector[0] == "Registro" && Vector[1] == "NumeroDeMateria")
+                    {
+                        // Con esto nos salteamos la primera linea.
+                    }
+                    else
+                    {
+                        MateriasAprobadas C = new MateriasAprobadas();
+                        C.nroRegistro = Int32.Parse(Vector[0]);
+                        C.nroMateria = Int32.Parse(Vector[1]);
+                        ListadeAprobadas.Add(C);
+
+
+                    }
+                }
+                abridor.Close();
+                return ListadeAprobadas;
+
+
+            }
+            catch (IOException e)
+            {
+                Console.WriteLine("No se pudo cargar la base de datos de materias. Asegurese que no este abierta y vuelva a abrir el programa:  " + e.Message);
+                Console.ReadLine();
+                Environment.Exit(0);
+                return null;
+            }
+
+
+        }
+
+
+
         public static void existenlasBases()
         {
             string direccionAlumnos = Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location), "alumnos.txt");
             string direccionCursos = Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location), "cursos.txt");
             string direccionMaterias = Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location), "materias.txt");
+            string direccionMateriasAprobadas = Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location), "materiasAprobadas.txt");
             string direccionAsignacion = Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location), "inscripciones.txt");
             FileInfo elPlan = new FileInfo(direccionAlumnos);
             FileInfo elPlan3 = new FileInfo(direccionCursos);
             FileInfo elPlan4 = new FileInfo(direccionAsignacion);
             FileInfo elPlan5 = new FileInfo(direccionMaterias);
+            FileInfo elPlan6 = new FileInfo(direccionMateriasAprobadas);
             if (!elPlan.Exists)
             {
                 Funciones.MostrarError("No se encuentra la base de datos de alumnos. No se puede continuar.");
@@ -236,6 +291,13 @@ namespace TrabajoPractico4
             if (!elPlan5.Exists)
             {
                 Funciones.MostrarError("No se encuentra la base de datos de materias. No se puede continuar.");
+                Console.ReadLine();
+                Environment.Exit(0);
+
+            }
+            if (!elPlan6.Exists)
+            {
+                Funciones.MostrarError("No se encuentra la base de datos de materias aprobadas. No se puede continuar.");
                 Console.ReadLine();
                 Environment.Exit(0);
 
