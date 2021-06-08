@@ -322,7 +322,7 @@ namespace TrabajoPractico4
                 {
                     actualizador.WriteLine(linea);
                     actualizador.Close();
-                    Console.WriteLine("Inscripcion a materia realizada.");
+                   // Console.WriteLine("Inscripcion a materia realizada.");
                     return true;
                 }
             }

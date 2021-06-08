@@ -54,6 +54,7 @@ namespace TrabajoPractico4
                     switch (opcion)
                     {
                         case 1:
+
                             yaseInscribio = false;
                             parseUltimascuatro = false;
                             estaenUltimas4 = false;
@@ -471,7 +472,7 @@ namespace TrabajoPractico4
                             ListadeMaterias2 = Funciones.CargarMaterias();
                             List<Cursos> ListadeCursos2 = new();
                             ListadeCursos2 = Funciones.CargarCursos();
-
+                            registro = false;
                             Console.WriteLine("Ingrese su numero de registro");
                             #region Buscar si el alumno existe en la bd
                             do
@@ -548,6 +549,8 @@ namespace TrabajoPractico4
                             } while (registro == false);
                             #endregion
                             Console.WriteLine();
+                            registro = false;
+                            numeroRegistro = 0;
                             break;
 
                         case 3:
